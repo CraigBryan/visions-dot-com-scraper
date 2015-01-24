@@ -5,32 +5,42 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from scrapy.contrib.exporter import JsonItemExporter
+from scrapy.contrib.exporter import JsonItemExporter, PprintItemExporter
 
-class VisionsPipeline(object):
+class VisionsPrettyPipeline(object):
 
   def __init__(self):
     self.exporter = None
 
   def open_spider(self, spider):
-    if spider.name == "category"
-      self.exporter = JsonItemExporter('categories.json')
+    if spider.name == "product":
+      self.exporter = PprintItemExporter(open('data/products.txt', 'w'))
       self.exporter.start_exporting()
 
-    elif spider.name == "product":
-      pass
-
   def process_item(self, item, spider):
-    if spider.name == "category":
+    if spider.name == "product":
       self.exporter.export_item(item)
       return item
 
-    elif spider.name == "product":
+    else:
       return item
 
   def close_spider(self, spider):
-    if spider.name == "category"
-      self.exporter.stop_exporting()
+    if spider.name == "product":
+      self.exporter.finish_exporting()
 
-    elif spider.name == "product":
-      pass
+class VisionJsonPipeline(object):
+
+  def __init__(self):
+    self.exporter = None
+
+  def open_spider(self, spider):
+    self.exporter = JsonItemExporter(open('data/%s.json' %spider.name, 'w'))
+    self.exporter.start_exporting()
+
+  def process_item(self, item, spider):
+    self.exporter.export_item(item)
+    return item
+
+  def close_spider(self, spider):
+    self.exporter.finish_exporting()

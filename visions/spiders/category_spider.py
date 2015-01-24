@@ -1,7 +1,6 @@
 from scrapy.spider import BaseSpider
 from scrapy.selector import Selector
 from visions.items import CategoryItem
-from scrapy.http import Request
 
 class CategorySpider(BaseSpider):
   name = "category"
