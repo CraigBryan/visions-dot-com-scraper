@@ -1,0 +1,10 @@
+#gitignore
+
+#ignore compiled python
+*.pyc
+
+#ignore temporary output file
+output.txt
+
+#ignore data folder
+data/*
