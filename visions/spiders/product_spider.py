@@ -1,8 +1,9 @@
 from scrapy.spider import Spider
 from scrapy.selector import Selector
+from scrapy.http import Request
 from visions.items import ProductItem
 from visions import utils
-from scrapy.http import Request
+from visions.selectors import PRODUCT_QUERIES as queries
 
 class ProductSpider(Spider):
   name = "product"
@@ -45,11 +46,11 @@ class ProductSpider(Spider):
 
   #pulls the category from the title of the main product panel
   def _extract_category(self, response):
-    query = '#ctl00_tdMainPanel > div > div > div > h1::text'
+    query = queries["extract_category"]
     return response.css(query).extract()[0]
 
   def _extract_detail_link(self, response):
-    query = "a#ctl00_ContentPlaceHolder1_ProductItemListUC1_ctrlProducts_ctl00_ProductItemUC1_lnkProductDetail::attr(href)"
+    query = queries["extract_detail_link"]
     
     # categories that have no products listed throw an IndexError
     try:
@@ -60,11 +61,11 @@ class ProductSpider(Spider):
     return link
 
   def _extract_title(self, response):
-    query = "span#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lblProdTitle::text"
+    query = queries["extract_title"]
     return response.css(query).extract()[0]
 
   def _extract_regular_price(self, response):
-    query = 'span#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lblRegprice > font::text'
+    query = queries["extract_regular_price"]
     
     try:
       price = response.css(query).extract()[0]
@@ -74,7 +75,7 @@ class ProductSpider(Spider):
     return price
 
   def _extract_sale_price(self, response):
-    query = 'span#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lblSaleprice > font::text'
+    query = queries["extract_sale_price"]
     
     try:
       price = response.css(query).extract()[0]
@@ -86,9 +87,9 @@ class ProductSpider(Spider):
   # Checks for a store only and web only. If neither are found, looks for 
   # 'add to cart' button (and then its assumed its available on both)
   def _extract_availability(self, response):
-    web_only_query = '#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lblWebonly'
-    store_only_query = '#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_imgInstoreonly'
-    add_to_cart_query = '#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lnkAddCart'
+    web_only_query = queries["extract_availability_web_only"]
+    store_only_query = queries["extract_availability_store_only"]
+    add_to_cart_query = queries["extract_availability_add_to_cart"]
 
     #check for web only == not available in store
     if response.css(web_only_query):

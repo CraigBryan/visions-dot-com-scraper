@@ -1,6 +1,7 @@
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 from visions.items import CategoryItem
+from visions.selectors import CATEGORY_QUERIES as queries
 
 class CategorySpider(Spider):
   name = "category"
@@ -45,29 +46,33 @@ class CategorySpider(Spider):
 
   #gives a list of the top level expander divs
   def _get_expanders(self, selector):
-    query = "#mastermenu-dropdown > .menulevel-0 > div.mastermenu-bigsub"
+    query = queries["get_expanders"]
     return selector.css(query)
 
   #gives a list of top level links in an expanded menu panel
   def _get_link_containers(self, expander):
-    query = "div > div > div"
+    query = queries["get_link_containers"]
     return expander.css(query)
 
   #gives a list of inner list of links, and true if any are found
   def _get_inner_links(self, container):
-    query = 'div > ul > li > a'
+    query = queries["get_inner_links"]
     return container.css(query)
 
   #given an anchor with the category in a child span, return the 
   #category name and href
   def _get_top_level_link_data(self, container):
-    name = container.css('div > a > span::text').extract()
-    url = container.css('div > a::attr(href)').extract()
-    return name[0], url[0]
+    name_query = queries["get_top_level_link_data_name"]
+    url_query = queries["get_top_level_link_data_url"]
+    name = container.css(name_query).extract()[0]
+    url = container.css(url_query).extract()[0]
+    return name, url
 
   #given an anchor with the category name contained within, return the
   #category name and href
   def _get_link_data(self, link):
-    name = link.css('a::text').extract()
-    url = link.css('a::attr(href)').extract()
+    name_query = queries["get_link_data_name"]
+    url_query = queries["get_link_data_url"]
+    name = link.css(name_query).extract()
+    url = link.css(url_query).extract()
     return name[0], url[0]
