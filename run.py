@@ -1,4 +1,10 @@
-# runner python script
+"""
+The main runner file. This is to be run from the command line. It takes
+one command argument.
+args:
+  test - runs the CSS selector tests
+  run - runs the two scrapers, in the correct order
+"""
 import sys
 import os
 
@@ -12,6 +18,11 @@ if sys.argv[1] == 'test':
   from test import tests
   tests.go()
 elif sys.argv[1] == 'run':
+
+  #create the data directory
+  if not os.path.exists("data"):
+    os.makedirs("data")
+
   os.system("scrapy crawl category")
   os.system("scrapy crawl product")
 else:

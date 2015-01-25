@@ -2,12 +2,16 @@ import scrapy
 import scrapy.contrib.loader
 
 class TestResult(scrapy.item.Item):
+  """Simple item to hold test results from the test spider"""
   result = scrapy.item.Field()
 
 class SelectorTestSpider(scrapy.spider.Spider):
+  """
+  Simple spider that applies the given CSS selector to the given URL and returns
+  the first text result from the list of Scrapy Selector elements
+  """ 
   name = 'selector_test'
 
-  #TODO pass in query and start_urls with -a foo=bar
   def __init__(self, category=None, start_url=None, 
                query=None, *args, **kwargs):
     super(SelectorTestSpider, self).__init__(*args, **kwargs)

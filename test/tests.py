@@ -4,7 +4,12 @@ import os
 import json
 
 class ScrapySelectorTestCase(object):
-  
+  """
+  A testcase class that runs the test_spider.py crawler. It uses the given url
+  and selector for the spider, and compares the result of the spider
+  (which it writes to a temporary file) to a given expected result.
+  """
+
   def __init__(self, name, url, css_query, expected):
     self.name = name
     self.url = url
@@ -12,6 +17,10 @@ class ScrapySelectorTestCase(object):
     self.expected = expected
 
   def run_test(self):
+    """
+    Runs the test using the test_spider and compares the result to the expected
+    result. Returns the success of the test and the reason for failure (if failed)
+    """
     open("data/temp.json", 'w').close()
     arg_string = "-a start_url='%s' -a query='%s' -o 'data/temp.json' -t 'json'" %(self.url, self.css_query)
     os.system("scrapy runspider test/test_spider.py " + arg_string)
@@ -27,6 +36,8 @@ class ScrapySelectorTestCase(object):
       return False, "Unexpected result"
 
   def _extract_temp_data(self):
+    """Gets the extracted test data from a temporary json file"""
+
     with open("data/temp.json", 'r') as json_file:
       data = json.load(json_file)
 
@@ -35,6 +46,8 @@ class ScrapySelectorTestCase(object):
     return data[0]["result"][0]
 
 def build_test_result(name, state, reason):
+  """Prints the test results somewhat nicely"""
+
   name += "_Test"
 
   if state:
@@ -43,6 +56,13 @@ def build_test_result(name, state, reason):
     return name + " FAILED " + reason
 
 def run_test_set(results, test_set_queries, test_set_urls):
+  """
+  Runs the tests for the given input and adds the results of the test to a 
+  given result list.
+    test_set_queries - the CSS selectors to be tested
+    test_set_urls - pairs of test urls and expected results for each CSS selector
+  """
+
   for name, css_query in test_set_queries.items():
     try:
       test_url = test_set_urls[name][0]
@@ -96,16 +116,21 @@ def rearrange_category_queries():
 
   # also, remove the tests for "get_container_links" and "get_header_link_containers"
   # because they are tested as part of other selectors and because the huge
-  # strings they return don't decode and encode to json very well
+  # strings they return don't encode to json very well
   del selectors.CATEGORY_QUERIES["get_container_links"]
   del selectors.CATEGORY_QUERIES["get_header_link_containers"]
 
 def cleanup():
+  """Removes temporary testing files"""
   os.remove('data/temp.json')
   os.remove('data/selector_test.json')
   os.remove('data/selector_test.txt')
 
 def go():
+  """
+  Called by the runner file. This runs both sets of tests and prints the results.
+  """
+
   results = []
 
   # Product crawler tests

@@ -7,7 +7,7 @@ This is my solution to the code challenge presented by 360pi. I learned and used
 Use the running script in the root directory.
 
 `python run.py test` runs the tests
-`python run.py run` runs the scraper
+`python run.py run` runs the scrapers
 
 ##Description
 This solution contains two main scrapers. The first `category_spider.py` visits the home page of [www.visions.ca](http://www.visions.ca) and gathers the categories and links to each of the category main pages. The second `product_scraper.py` is loaded with the URL's for each category and then selects the first product from each category URL and gets the desired information (title, sale price, regular price, availability).
@@ -31,4 +31,4 @@ In many cases, my product crawler failed to find a regular price, and instead fo
 ##Testing:
 I was unsure how to go about testing my scraper in a reliable manner. Scrapy contracts seemed a weak (either that or I don't understand them fully), and I don't know the best practices to test scrapers. 
 
-I decided that the most likely reason for this code to break is that the [www.visions.ca](http://www.visions.ca) would change, and therefore my selectors would stop working. So, I wrote another spider `test_spider.py` and I'm using it to independently test each css selector I used against a known live page. That way, if the tests start failing, I'll be alerted that the site has changed somehow. I also had to add a supporting module `tests.py` to run tests on this new spider. Overall, I think there are a lot of ways to improve the testing I've implemented for this crawler.
+I decided that the most likely reason for this code to break is that the [www.visions.ca](http://www.visions.ca) would change, and therefore my selectors would stop working. So, I wrote another spider `test_spider.py` and I'm using it to independently test each css selector I used against a known live page. That way, if the tests start failing, I'll be alerted that the site has changed somehow. I also had to add a supporting module `tests.py` to run tests on this new spider. Unfortunately, the tests may also themselves break for innoculous website changes. For example, if the product I'm using to test my 'sale price' selector is no longer on sale, that test will fail, even if the selector still works fine.

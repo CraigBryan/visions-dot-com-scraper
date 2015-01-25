@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-
 from scrapy.contrib.exporter import JsonItemExporter, PprintItemExporter
 from scrapy.exceptions import DropItem
 
 class VisionsPrettyPipeline(object):
-
+  """
+  Pretty-prints category and product data to a file (data/category.txt or
+  data/product.txt)
+  """
   def __init__(self):
     self.exporter = None
 
@@ -25,7 +23,10 @@ class VisionsPrettyPipeline(object):
     self.exporter.finish_exporting()
 
 class VisionsJsonPipeline(object):
-
+  """
+  Prints category and product data to a JSON file (data/category.json or
+  data/product.json)
+  """
   def __init__(self):
     self.exporter = None
 
@@ -41,7 +42,9 @@ class VisionsJsonPipeline(object):
     self.exporter.finish_exporting()
 
 class VisionsValidatorPipeline(object):
-
+  """
+  Pipeline to modify any malformed retrieved data.
+  """
   def process_item(self, item, spider):
     if spider.name == "product":
       self._validate_product(item)
@@ -54,15 +57,18 @@ class VisionsValidatorPipeline(object):
     else:
       return item
 
-  # Because the website uses the sale price id as the regular price sometimes,
-  # we swap the sale price to the regular price
   def _validate_product(self, item):
+    """
+    Swaps the sale price for the regular price when a regular price is not 
+    present and the sale price is present.
+    """
     if not item['regular_price'] and item['sale_price']:
       item['regular_price'] = item['sale_price']
       item['sale_price'] = None
 
-  # There is a link found that is just to expand a menu. It has no real url, so
-  # it gets filtered out
   def _validate_category(self, item):
+    """
+    Drops any category items that have an empty url.
+    """
     if item['url'] == '#' or item['url'] == '':
       raise DropItem("Empty url found")
