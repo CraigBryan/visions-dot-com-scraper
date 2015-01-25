@@ -83,8 +83,30 @@ class ProductSpider(Spider):
 
     return price
 
+  # Checks for a store only and web only. If neither are found, looks for 
+  # 'add to cart' button (and then its assumed its available on both)
   def _extract_availability(self, response):
-    #check for add to cart == available online
-      #check for web only == not available in store
+    web_only_query = '#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lblWebonly'
+    store_only_query = '#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_imgInstoreonly'
+    add_to_cart_query = '#ctl00_ContentPlaceHolder1_ctrlProdDetailUC_lnkAddCart'
+
+    #check for web only == not available in store
+    if response.css(web_only_query):
+      availability = self._set_availability(True, False)
+
     #check for store only == available in store only
-    pass
+    elif response.css(store_only_query):
+      availability = self._set_availability(False, True)
+
+    #check for add to cart == available online and in store
+    elif response.css(add_to_cart_query):
+      availability = self._set_availability(True, True)
+
+    #not available at either (assumed)
+    else:
+      availability = self._set_availability(False, False)
+
+    return availability
+
+  def _set_availability(self, web, store):
+    return {"web": web, "store": store}
