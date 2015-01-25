@@ -6,6 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 from scrapy.contrib.exporter import JsonItemExporter, PprintItemExporter
+from scrapy.exceptions import DropItem
 
 class VisionsPrettyPipeline(object):
 
@@ -46,6 +47,10 @@ class VisionsValidatorPipeline(object):
       self._validate_product(item)
       return item
 
+    elif spider.name == "category":
+      self._validate_category(item)
+      return item
+
     else:
       return item
 
@@ -55,3 +60,9 @@ class VisionsValidatorPipeline(object):
     if not item['regular_price'] and item['sale_price']:
       item['regular_price'] = item['sale_price']
       item['sale_price'] = None
+
+  # There is a link found that is just to expand a menu. It has no real url, so
+  # it gets filtered out
+  def _validate_category(self, item):
+    if item['url'] == '#' or item['url'] == '':
+      raise DropItem("Empty url found")
