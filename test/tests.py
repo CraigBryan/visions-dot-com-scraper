@@ -12,10 +12,14 @@ class ScrapySelectorTestCase(object):
     self.expected = expected
 
   def run_test(self):
+    open("data/temp.json", 'w').close()
     arg_string = "-a start_url='%s' -a query='%s' -o 'data/temp.json' -t 'json'" %(self.url, self.css_query)
     os.system("scrapy runspider test/test_spider.py " + arg_string)
 
-    result = self._extract_temp_data()
+    try:
+      result = self._extract_temp_data()
+    except Exception as e:
+      return False, "An error was raised: %s" %e
 
     if result == self.expected:
       return True, ""
@@ -58,21 +62,29 @@ def run_test_set(results, test_set_queries, test_set_urls):
 # the category spider. This builds the selectors into selectors that can be 
 # used atomically in the tests
 def rearrange_category_queries():
-  selectors.CATEGORY_QUERIES["get_link_containers"] = \
-    selectors.CATEGORY_QUERIES["get_expanders"] + \
-    selectors.CATEGORY_QUERIES["get_link_containers"][3::]
+  selectors.CATEGORY_QUERIES["get_header_link_containers"] = \
+    selectors.CATEGORY_QUERIES["get_container_links"] + \
+    selectors.CATEGORY_QUERIES["get_header_link_containers"][14::]
   
   selectors.CATEGORY_QUERIES["get_inner_links"] = \
-    selectors.CATEGORY_QUERIES["get_link_containers"] + \
+    selectors.CATEGORY_QUERIES["get_header_link_containers"] + \
     selectors.CATEGORY_QUERIES["get_inner_links"][3::]
 
   selectors.CATEGORY_QUERIES["get_top_level_link_data_name"] = \
-    selectors.CATEGORY_QUERIES["get_link_containers"] + \
-    selectors.CATEGORY_QUERIES["get_top_level_link_data_name"][3::]
+    selectors.CATEGORY_QUERIES["get_container_links"] + \
+    selectors.CATEGORY_QUERIES["get_top_level_link_data_name"][14::]
 
   selectors.CATEGORY_QUERIES["get_top_level_link_data_url"] = \
-    selectors.CATEGORY_QUERIES["get_link_containers"] + \
-    selectors.CATEGORY_QUERIES["get_top_level_link_data_url"][3::]
+    selectors.CATEGORY_QUERIES["get_container_links"] + \
+    selectors.CATEGORY_QUERIES["get_top_level_link_data_url"][14::]
+
+  selectors.CATEGORY_QUERIES["get_mid_level_link_data_name"] = \
+    selectors.CATEGORY_QUERIES["get_header_link_containers"] + \
+    selectors.CATEGORY_QUERIES["get_mid_level_link_data_name"][3::]
+
+  selectors.CATEGORY_QUERIES["get_mid_level_link_data_url"] = \
+    selectors.CATEGORY_QUERIES["get_header_link_containers"] + \
+    selectors.CATEGORY_QUERIES["get_mid_level_link_data_url"][3::]
 
   selectors.CATEGORY_QUERIES["get_link_data_name"] = \
     selectors.CATEGORY_QUERIES["get_inner_links"] + \
@@ -82,11 +94,11 @@ def rearrange_category_queries():
     selectors.CATEGORY_QUERIES["get_inner_links"] + \
     selectors.CATEGORY_QUERIES["get_link_data_url"][1::]
 
-  # also, remove both the tests for "get_expanders" and "get_link_containers"
+  # also, remove the tests for "get_container_links" and "get_header_link_containers"
   # because they are tested as part of other selectors and because the huge
   # strings they return don't decode and encode to json very well
-  del selectors.CATEGORY_QUERIES["get_expanders"]
-  del selectors.CATEGORY_QUERIES["get_link_containers"]
+  del selectors.CATEGORY_QUERIES["get_container_links"]
+  del selectors.CATEGORY_QUERIES["get_header_link_containers"]
 
 def cleanup():
   os.remove('data/temp.json')
