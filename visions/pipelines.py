@@ -29,7 +29,7 @@ class VisionsPrettyPipeline(object):
     if spider.name == "product":
       self.exporter.finish_exporting()
 
-class VisionJsonPipeline(object):
+class VisionsJsonPipeline(object):
 
   def __init__(self):
     self.exporter = None
@@ -44,3 +44,20 @@ class VisionJsonPipeline(object):
 
   def close_spider(self, spider):
     self.exporter.finish_exporting()
+
+class VisionsValidatorPipeline(object):
+
+  def process_item(self, item, spider):
+    if spider.name == "product":
+      self._validate_product(item)
+      return item
+
+    else:
+      return item
+
+  # Because the website uses the sale price id as the regular price sometimes,
+  # we swap the sale price to the regular price
+  def _validate_product(self, item):
+    if not item['regular_price'] and item['sale_price']:
+      item['regular_price'] = item['sale_price']
+      item['sale_price'] = None

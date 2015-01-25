@@ -13,7 +13,8 @@ BOT_NAME = 'visions'
 SPIDER_MODULES = ['visions.spiders']
 NEWSPIDER_MODULE = 'visions.spiders'
 
-ITEM_PIPELINES = { 'visions.pipelines.VisionsJsonPipeline': 100,
+ITEM_PIPELINES = { 'visions.pipelines.VisionsValidatorPipeline' :99,
+                   'visions.pipelines.VisionsJsonPipeline': 100,
                    'visions.pipelines.VisionsPrettyPipeline': 101}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

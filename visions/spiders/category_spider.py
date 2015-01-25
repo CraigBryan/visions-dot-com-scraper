@@ -1,8 +1,8 @@
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.selector import Selector
 from visions.items import CategoryItem
 
-class CategorySpider(BaseSpider):
+class CategorySpider(Spider):
   name = "category"
   allow_domains = ["visions.ca"]
   start_urls = ["http://www.visions.ca"]
