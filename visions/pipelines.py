@@ -13,21 +13,15 @@ class VisionsPrettyPipeline(object):
     self.exporter = None
 
   def open_spider(self, spider):
-    if spider.name == "product":
-      self.exporter = PprintItemExporter(open('data/products.txt', 'w'))
-      self.exporter.start_exporting()
+    self.exporter = PprintItemExporter(open('data/%s.txt' %spider.name, 'w'))
+    self.exporter.start_exporting()
 
   def process_item(self, item, spider):
-    if spider.name == "product":
-      self.exporter.export_item(item)
-      return item
-
-    else:
-      return item
+    self.exporter.export_item(item)
+    return item
 
   def close_spider(self, spider):
-    if spider.name == "product":
-      self.exporter.finish_exporting()
+    self.exporter.finish_exporting()
 
 class VisionsJsonPipeline(object):
 
