@@ -2,7 +2,6 @@
 
 import scrapy
 
-
 class ProductItem(scrapy.Item):
     """Item to hold product information. The product spider uses this item."""
     category = scrapy.Field()
